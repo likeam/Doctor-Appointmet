@@ -1,10 +1,17 @@
 import express from "express";
 import morgan from "morgan";
 import dotenv from "dotenv";
+import connectDB from "./config/db.js";
+
+import userRouters from "./routers/userRouters.js";
 
 //dotenv config
 
 dotenv.config();
+
+//Mongoose DB connection
+
+connectDB();
 
 const app = express();
 
@@ -14,12 +21,13 @@ app.use(express.json());
 app.use(morgan("dev"));
 
 //Routes
+app.use("/api/v1/users", userRouters);
 
-app.get("/", (req, res) => {
-  res.status(200).send({
-    message: "Sererver is Running Susscessfully",
-  });
-});
+// app.get("/", (req, res) => {
+//   res.status(200).send({
+//     message: "Sererver is Running Susscessfully",
+//   });
+// });
 
 //Port
 
