@@ -1,40 +1,36 @@
-import bcrypt from "bcryptjs";
 import User from "./../models/userModel.js";
+import asyncHandler from "../middlewares/asyncHandler.js";
 
 // Login Controller
-const loginController = () => {};
+const loginUser = () => {};
 
 //  Register Controller
-const registerController = async () => {
-  try {
-    // Existising User
-    const existingUser = await User.findOne({ email: req.body.email });
-    if (existingUser) {
-      return res
-        .status(200)
-        .send({ message: "User Already Exists", success: false });
-    }
+const registerUser = asyncHandler(async (req, res) => {
+  const { name, email, password } = req.body;
 
-    // Password
+  console.log(name);
+  console.log(email);
+  console.log(password);
 
-    const password = req.body.password;
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
-    // Replave password with hashed password
-    req.body.password = hashedPassword;
-
-    // New User
-
-    const newUser = new User(req.body);
-    await newUser.save();
-    res.status(201).send({ message: "Registration Successfull", succes: true });
-  } catch (error) {
-    console.log(error);
-    res.status(500).send({
-      success: false,
-      message: "Register Controller Error ${error.message}",
-    });
+  if (!name || !email || !password) {
+    throw new Error("Please fill all the Input fields");
   }
-};
 
-export { loginController, registerController };
+  // Existising User
+  const existingUser = await User.findOne({ email });
+  if (existingUser) res.status(400).send({ message: "User Already Exists" });
+
+  const newUser = new User({ name, email, password });
+
+  try {
+    await newUser.save();
+    res
+      .status(201)
+      .jason({ _id: newUser._id, name: newUser.name, email: newUser.email });
+  } catch (error) {
+    res.status(400);
+    throw new Error("Invalid user Data");
+  }
+});
+
+export { loginUser, registerUser };
