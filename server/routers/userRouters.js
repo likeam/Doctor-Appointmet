@@ -4,9 +4,9 @@ import { loginUser, registerUser } from "../controllers/userControllers.js";
 // Router
 const router = express.Router();
 
-Routes
+// Routes
 
-Login Router
+// Login Router
 router.post("/login", loginUser);
 
 // Register Router

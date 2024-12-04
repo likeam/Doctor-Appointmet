@@ -1,5 +1,7 @@
 import User from "./../models/userModel.js";
 import asyncHandler from "../middlewares/asyncHandler.js";
+import bcrypt from "bcryptjs";
+import createToken from "../utils/createToken.js";
 
 // Login Controller
 const loginUser = () => {};
@@ -20,10 +22,14 @@ const registerUser = asyncHandler(async (req, res) => {
   const existingUser = await User.findOne({ email });
   if (existingUser) res.status(400).send({ message: "User Already Exists" });
 
-  const newUser = new User({ name, email, password });
+  const salt = await bcrypt.genSalt(10);
+  const hashedPassword = await bcrypt.hash(password, salt);
+
+  const newUser = new User({ name, email, password: hashedPassword });
 
   try {
     await newUser.save();
+    createToken(res, newUser._id);
     res
       .status(201)
       .jason({ _id: newUser._id, name: newUser.name, email: newUser.email });
