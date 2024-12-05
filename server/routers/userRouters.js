@@ -5,6 +5,7 @@ import {
   logoutUser,
   getAllUsers,
   getUserProfile,
+  updateCurrentUser,
 } from "../controllers/userControllers.js";
 
 // MiddleWate
@@ -29,7 +30,10 @@ router
   .get(authenticate, authorizeAdmin, getAllUsers);
 
 // User Profile
-router.route("/profile").get(authenticate, getUserProfile);
+router
+  .route("/profile")
+  .get(authenticate, getUserProfile)
+  .put(authenticate, updateCurrentUser);
 
 // Logout User Route5r
 router.post("/logout", logoutUser);

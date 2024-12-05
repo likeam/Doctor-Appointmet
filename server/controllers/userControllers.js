@@ -83,4 +83,38 @@ const getUserProfile = asyncHandler(async (req, res) => {
   }
 });
 
-export { loginUser, registerUser, logoutUser, getAllUsers, getUserProfile };
+const updateCurrentUser = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.user._id);
+
+  if (user) {
+    user.name = req.body.name || user.name;
+    user.email = req.body.email || user.email;
+
+    if (req.body.password) {
+      const salt = await bcrypt.genSalt(10);
+      const hashedPassword = await bcrypt.hash(req.body.password, salt);
+      user.password = hashedPassword;
+    }
+
+    const updatedUser = await user.save();
+
+    res.json({
+      _id: updatedUser._id,
+      name: updatedUser.name,
+      email: updatedUser.email,
+      isAdmin: updatedUser.isAdmin,
+    });
+  } else {
+    res.status(404);
+    throw new Error("User not found");
+  }
+});
+
+export {
+  loginUser,
+  registerUser,
+  logoutUser,
+  getAllUsers,
+  getUserProfile,
+  updateCurrentUser,
+};
